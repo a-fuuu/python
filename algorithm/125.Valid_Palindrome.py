@@ -35,7 +35,9 @@ class Palindrome:
     def isPalindrome_slicing(self):
         s = re.sub('[^a-z0-9]', '', self.s)
         return print(s == s[::-1])
+
 ipt = input().lower()
+
 start_time = time.time()
 Palindrome(ipt).isPalindrome_pop()
 end_time = time.time()
