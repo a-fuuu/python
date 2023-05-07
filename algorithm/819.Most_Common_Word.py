@@ -19,7 +19,6 @@ def find_most_common_word(word : str, banned_word : list) -> str:
     # for word in words:
     #     counter[word] += 1
     
-    
     # # max 함수 사용 key 설정 필요
     # return max(counter, key=counter.get)
     
