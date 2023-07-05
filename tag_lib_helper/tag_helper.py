@@ -7,8 +7,8 @@ def get_translate(text):
     네이버 파파고 API를 활용한
     한-영 번역을 수행하는 함수입니다.
     '''
-    client_id = "Y4Jxi3ZA0ms0yiG42i3W" # <-- client_id 기입
-    client_secret = "6C7brruCIx" # <-- client_secret 기입
+    client_id = "" # <-- client_id 기입
+    client_secret = "" # <-- client_secret 기입
 
     data = {'text' : text,
             'source' : 'ko',
