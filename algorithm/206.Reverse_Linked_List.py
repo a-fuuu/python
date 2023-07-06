@@ -8,17 +8,13 @@ class ListNode:
         self.next = None
 
 class Solution():
-    def reverseLinkedList(self, l1: ListNode):
-        node = l1
-
-        result = ListNode(node)
-
-        while node is not None:
-            result.next = node
-            node = node.next
-            result.val = result.next
-        
-        return result
+    def reverseLinkedList(self, head: ListNode):
+        def reverse(node: ListNode, prev: ListNode = None):
+            if not node:
+                return prev
+            next, node.next = node.next, prev
+            return reverse(next, node)
+        return reverse(head)
     
 solution = Solution()
 lst1 = ListNode(1)
