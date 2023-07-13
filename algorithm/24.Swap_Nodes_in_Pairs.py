@@ -36,7 +36,14 @@ class Solution:
             prev = prev.next.next
         
         return root.next
-
+    
+    def pair_swap_3(self, head:ListNode)->ListNode:
+        if head and head.next:
+            p = head.next
+            head.next = self.pair_swap_3(p.next)
+            p.next = head
+            return p
+        return head
 
 
         
@@ -49,6 +56,12 @@ lst2.next.next = ListNode(4)
 lst2.next.next.next = ListNode(5)
 
 result = solution.pair_swap_2(lst2)
+
+while result:
+    print(result.val)
+    result = result.next
+    
+result = solution.pair_swap_3(lst2)
 
 
 while result:
