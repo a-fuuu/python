@@ -10,17 +10,18 @@ class ListNode:
 
 class Solution:
     def odd_next_even(self, head:ListNode):
-        node = head
-        while node.val and node.next:
-            if divmod(node.val, 2)[1] == 1 and divmod(node.next.val, 2)[1] == 0:
-                node = head.next.next
+        if head is None:
+            return None
         
-            elif divmod(node.val, 2)[1] == 1 and divmod(node.next.val, 2)[1] == 1:
-                node.next, node.next.next = node.next.next, node.next
-                node = head.next
-            
-            else:
+        odd = head
+        even = head.next
+        even_head = head.next
 
+        while even and even.next:
+            odd.next, even.next = odd.next.next, even.next.next
+            odd, even = odd.next, even.next
+
+        odd.next = even_head
         return head
     
 solution = Solution()
