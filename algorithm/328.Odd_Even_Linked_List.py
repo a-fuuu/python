@@ -1,5 +1,5 @@
 '''
-연결 리스트를 홀수 노드 다음에 짝수가 오도록 재구성하여라
+연결 리스트를 홀수 노드 다음에 짝수가 오도록 재구성하여라 (노드 값이 홀수인지 짝수인지가 아니라 순서)
 '''
 
 # 연결리스트 class
@@ -25,11 +25,11 @@ class Solution:
         return head
     
 solution = Solution()
-lst2 = ListNode(1)
-lst2.next = ListNode(2)
-lst2.next.next = ListNode(3)
-lst2.next.next.next = ListNode(4)
-lst2.next.next.next.next = ListNode(5)
+lst2 = ListNode(2)
+lst2.next = ListNode(4)
+lst2.next.next = ListNode(6)
+lst2.next.next.next = ListNode(1)
+lst2.next.next.next.next = ListNode(3)
 
 result = solution.odd_next_even(lst2)
 
