@@ -6,7 +6,6 @@ ex) J = 'aA'
     S = 'aAAbbb'
 -> 3
 '''
-
 from collections import Counter
 
 class Solution:
@@ -19,6 +18,7 @@ class Solution:
         
         return count
     
+    # Hash Map을 사용한 풀이
     def hash_jewels(self, J:str, S:str)->int:
         freqs = {}
         count = 0
