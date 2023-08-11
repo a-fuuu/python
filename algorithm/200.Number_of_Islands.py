@@ -24,7 +24,7 @@ class Solution:
             if i < 0 or i >= len(map) or j < 0 or j >= len(map[0]) or map[i][j] != '1':
                 return
 
-            map[i][j] = 0
+            map[i][j] = '0' # 이부분 덕분에 count가 조절됐음
             dfs(i + 1, j)
             dfs(i - 1, j)
             dfs(i, j + 1)
@@ -36,14 +36,14 @@ class Solution:
                 if map[i][j] == '1':
                     dfs(i, j)
                     count += 1
-        return count
+        return count, map
     
 
 if __name__ == '__main__':
     sol = Solution()
 
     ans = sol.num_of_island([['1', '1', '0'],
-                       ['0', '0', '1'],
-                       ['0', '1', '0']])
+                        ['0', '0', '1'],
+                        ['0', '1', '0']])
     
     print(ans)
