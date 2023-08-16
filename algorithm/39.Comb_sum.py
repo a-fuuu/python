@@ -10,19 +10,16 @@ target = 7
 class Solution:
     def comb_sum(self, cand:list[int], target:int):
         result = []
-        def dfs(pick:list[int], candi:list[int])->list[int]:
-            if sum(pick) == target:
-                result.append(pick)
-                pick = []
+        def dfs(csum, index, path)->list[int]:
+            if csum < 0:
                 return
-            elif sum(pick) > target:
-                pick = []
+            if csum == 0:
+                result.append(path)
                 return
-            for num in candi:
-                pick.append(num)
-                dfs(pick, candi)
-        dfs([], cand)
-
+            
+            for i in range(index, len(cand)):
+                dfs(csum - cand[i],i, path + [cand[i]])
+        dfs(target, 0, [])
         return result
     
 if __name__ == '__main__':
