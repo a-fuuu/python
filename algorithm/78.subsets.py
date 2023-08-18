@@ -5,16 +5,18 @@
 '''
 
 class Solution():
-    def subset(self, nums:list(int))->list[list[int]]:
-        result = [[], nums]
-        def dfs(path, index, candidates):
-            if len(path) == len(nums):
-                result.append(path)
-                return
-            elif len(path) == 0:
-                result.append([])
+    def subset(self, nums:list[int])->list[list[int]]:
+        result = []
+        def dfs(path, index):
+            result.append(path)
 
-            for element in candidates:
-                path.append(element)
-                
-                
+            for i in range(index, len(nums)):
+                dfs(path + [nums[i]], i+1)
+        
+        dfs([], 0)
+        return result
+
+if __name__ == '__main__':
+    sol = Solution()
+    res = sol.subset([1,2,3,4,5,6,7])
+    print(res)
