@@ -7,6 +7,8 @@ k부터 출발할 때 모든 노드가 신호를 받을 수 잇는 시간을 계
 import collections
 import heapq
 
+
+# 우선순위 큐를 활용한 풀이 방식
 class Solution:
     def network_delay_time(self, node:list[list[int]], N:int, K:int):
         route = collections.defaultdict(list)
