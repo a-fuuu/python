@@ -16,7 +16,7 @@ class Solution:
             route[a].append((b, c))
         
         Q = [(0, K)]
-
+        print(route)
         dist = collections.defaultdict(int)
 
         while Q:
