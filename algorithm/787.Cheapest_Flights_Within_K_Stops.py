@@ -16,12 +16,21 @@ class Solution:
         for src, dst, cst in edges:
             graph[src].append((dst, cst))
         
-        Q = [(0, 0, None)]
-        result = []
+        Q = [(0, src, K)]
         while Q:
-            cost, k, node = heapq.heappop(Q)
+            cost, node, k = heapq.heappop(Q)
             if node == dst:
-                result.append([cost, k])
-            
+                return cost
+            if k >= 0:
+                for v,w in graph[node]:
+                    alt = cost + w
+                    heapq.heappush(Q, (alt, v, k - 1))
+        return -1
+    
 
-
+if __name__ == '__main__':
+    sol = Solution()
+    result = sol.cheapeast_flight(3, [[0,1,100],[1,2,100],[0,2,500]], 0, 2, 0)
+    print(result)
+    result = sol.cheapeast_flight(3, [[0,1,100],[1,2,100],[0,2,500]], 0, 2, 2)
+    print(result)
