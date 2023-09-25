@@ -1,59 +1,103 @@
 import os
 import shutil
-import pandas as pd
 import openpyxl
+import requests
+import re
+import json
 
-# 파일의 경로를 지정합니다
-path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx"
+# 파일 다운로드
 
-filename = os.path.basename(path)
+def file_download():
+    path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx"
 
-local_path = "./"
+    filename = os.path.basename(path)
 
-# 최신 tag library 요청 리스트를 받기 위해 파일이 존재하는 경우 삭제
-if os.path.exists("./통합 문서.xlsx"):
-    os.remove("./통합 문서.xlsx")
+    local_path = "./"
 
-# 파일을 local path에 복사합니다. Onedrive 경로의 파일은 접근 권한 이슈가 있음
-shutil.copyfile(path, os.path.join(local_path, filename))
+    # 최신 tag library 요청 리스트를 받기 위해 파일이 존재하는 경우 삭제
+    if os.path.exists("./통합 문서.xlsx"):
+        os.remove("./통합 문서.xlsx")
+
+    # 파일을 local path에 복사합니다. Onedrive 경로의 파일은 접근 권한 이슈가 있음
+    shutil.copyfile(path, os.path.join(local_path, filename))
+
+excel_file_path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx"
+
+def translate(text):
+    '''
+    네이버 파파고 API를 활용한
+    한-영 번역을 수행하는 함수입니다.
+    '''
+
+    with open('./key.txt', 'r') as key_file:
+        contents = key_file.read()
+        contents = contents.split('\n')
+        client_id = contents[0]
+        client_secret = contents[1]
+
+    data = {'text' : text,
+            'source' : 'ko',
+            'target': 'en'}
+
+    url = "https://openapi.naver.com/v1/papago/n2mt"
+
+    header = {"X-Naver-Client-Id":client_id,
+            "X-Naver-Client-Secret":client_secret}
+
+    response = requests.post(url, headers=header, data=data)
+    rescode = response.status_code
+
+    if(rescode==200):
+        send_data = response.json()
+        trans_data = (send_data['message']['result']['translatedText'])
+        return trans_data.lower()
+    else:
+        print("Error Code:" , rescode)
+
+def extract_translate_append():
+    wb = openpyxl.load_workbook(excel_file_path)
+    sheet = wb['Sheet1']
+
+    file_path = './hl_standards_new_tag.json'
+    with open(file_path, encoding='utf-8') as f:
+        data = json.load(f)
+
+    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=14, max_col=14):
+        for cell in row:
+            row_number = cell.row
+            if cell.value is None:
+                if sheet.cell(row=row_number, column=8).value is not None:
+                    req = sheet.cell(row=row_number, column=8).value
+                    req_list = re.split(r"\n|,", req)
+
+                    # 빈 element 제거
+                    req_list = [x for x in req_list if x != '']
+                    result = []
+                    for val in req_list:
+                        kr = re.sub(r"\[.*\]", '', val)
+                        en = translate(kr.strip())
+                        id = re.sub("-| ", '_', en)
+                        output = { "id" : str(id), "en" : str(en), "kr" : str(kr) }
+                        result.append(output)
+    for item in result:
+        data["hl_standards_tag"][0]["analysis_item"][0]['key_tag'][0]['common'].append(item)
+    data = sorted(data["hl_standards_tag"][0]["analysis_item"][0]["key_tag"][0]['common'], key = lambda x:x['kr'])
+
+    print(data)
 
 
 
+                        
 
-##################################여기서부터#################################
+    
+    wb.save("/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx")
+    wb.close()
 
-excel_file_path = "./통합 문서.xlsx"
+    # path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/"
+    # filename = os.path.basename(excel_file_path)
+    # if os.path.exists("/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx"):
+    #     os.remove("/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx")
+    # shutil.copyfile(excel_file_path, os.path.join(path, filename))
 
-# Excel 파일을 데이터프레임으로 읽어오기
-df = pd.read_excel(excel_file_path, header=1)
-
-# 처리상태가 비어있는 항목들 선택
-todo = df[df['처리상태'].isna()]
-
-todo = todo[['처리상태', '내용']]
-
-# 데이터프레임 출력 (옵션)
-# print(todo)
-for row in todo['내용']:
-    print(row)
-
-# Load the Excel workbook
-workbook = openpyxl.load_workbook("./통합 문서.xlsx")
-
-# Select the worksheet you want to modify
-worksheet = workbook['Sheet1']
-
-cell = worksheet.cell(row=2, column=3)  # Row 2, Column C
-
-# Change the value of the cell
-cell.value = 'TEST'
-
-# Save the modified workbook
-workbook.save('통합 문서.xlsx')
-
-path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/"
-filename = os.path.basename(excel_file_path)
-if os.path.exists("/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx"):
-    os.remove("/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx")
-
-shutil.copyfile(excel_file_path, os.path.join(path, filename))
+if __name__=='__main__':
+    extract_translate_append()
