@@ -85,10 +85,6 @@ def extract_translate_append():
 
     print(data)
 
-
-
-                        
-
     
     wb.save("/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx")
     wb.close()
