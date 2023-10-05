@@ -5,6 +5,9 @@ import requests
 import re
 import json
 
+# tag 요청 리스트 상대경로
+excel_file_path = "./통합 문서.xlsx"
+
 # 파일 다운로드
 
 def file_download():
@@ -20,8 +23,6 @@ def file_download():
 
     # 파일을 local path에 복사합니다. Onedrive 경로의 파일은 접근 권한 이슈가 있음
     shutil.copyfile(path, os.path.join(local_path, filename))
-
-excel_file_path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx"
 
 def translate(text):
     '''
@@ -59,9 +60,11 @@ def extract_translate_append():
     sheet = wb['Sheet1']
 
     file_path = './hl_standards_new_tag.json'
+
     with open(file_path, encoding='utf-8') as f:
         data = json.load(f)
-
+    
+    result = []
     for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=14, max_col=14):
         for cell in row:
             row_number = cell.row
@@ -72,7 +75,7 @@ def extract_translate_append():
 
                     # 빈 element 제거
                     req_list = [x for x in req_list if x != '']
-                    result = []
+                    
                     for val in req_list:
                         kr = re.sub(r"\[.*\]", '', val)
                         en = translate(kr.strip())
@@ -81,12 +84,9 @@ def extract_translate_append():
                         result.append(output)
     for item in result:
         data["hl_standards_tag"][0]["analysis_item"][0]['key_tag'][0]['common'].append(item)
-    data = sorted(data["hl_standards_tag"][0]["analysis_item"][0]["key_tag"][0]['common'], key = lambda x:x['kr'])
-
-    print(data)
-
     
-    wb.save("/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx")
+    with open('./hl_standards_new_tag_1.json', 'w', encoding='utf-8') as output:
+        json.dump(data, output, indent=2, ensure_ascii=False)
     wb.close()
 
     # path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/"
@@ -96,4 +96,8 @@ def extract_translate_append():
     # shutil.copyfile(excel_file_path, os.path.join(path, filename))
 
 if __name__=='__main__':
+    # 수행요청 list file 다운로드
+    file_download()
+
+    # 다운 받은 excel file 기반으로 추가할 list 정리
     extract_translate_append()
