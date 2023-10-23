@@ -74,14 +74,14 @@ def extract_translate_append():
     version = [str(x) for x in version]
     version[-1] = "{:0<{width}}".format(version[-1], width=2)
     version = ".".join(version)
-
     data["version"] = version
+
     result = []
     for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=14, max_col=14):
         for cell in row:
             row_number = cell.row
             if cell.value is None:
-                if sheet.cell(row=row_number, column=8).value is not None:
+                if sheet.cell(row=row_number, column=8).value is not None: # 완료 표시가 없는 항목
                     req = sheet.cell(row=row_number, column=8).value
                     req_list = re.split(r"\n|,", req)
 
