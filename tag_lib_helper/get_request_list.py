@@ -6,20 +6,20 @@ import re
 import json
 
 # tag 요청 리스트 상대경로
-excel_file_path = "./통합 문서.xlsx"
+excel_file_path = "./Tag_library_추가요청.xlsx"
 
 # 파일 다운로드
 
 def file_download():
-    path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/통합 문서.xlsx"
+    path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/Tag_library_추가요청.xlsx"
 
     filename = os.path.basename(path)
 
     local_path = "./"
 
     # 최신 tag library 요청 리스트를 받기 위해 파일이 존재하는 경우 삭제
-    if os.path.exists("./통합 문서.xlsx"):
-        os.remove("./통합 문서.xlsx")
+    if os.path.exists("./Tag_library_추가요청.xlsx"):
+        os.remove("./Tag_library_추가요청.xlsx")
     # 파일을 local path에 복사합니다. Onedrive 경로의 파일은 접근 권한 이슈가 있음
     shutil.copyfile(path, os.path.join(local_path, filename))
 
@@ -60,7 +60,7 @@ def extract_translate_append():
     sheet = wb['Sheet1']
 
     file_path = '../../../professional/modelmapping/de_server/db_to_excel/hl_standards_new_tag.json'
-
+    
     with open(file_path, encoding='utf-8') as f:
         data = json.load(f)
     
