@@ -4,6 +4,7 @@ import openpyxl
 import requests
 import re
 import json
+from konlpy.tag import Okt
 
 # tag 요청 리스트 상대경로
 excel_file_path = "./Tag_library_추가요청.xlsx"
@@ -20,6 +21,7 @@ def file_download():
     # 최신 tag library 요청 리스트를 받기 위해 파일이 존재하는 경우 삭제
     if os.path.exists("./Tag_library_추가요청.xlsx"):
         os.remove("./Tag_library_추가요청.xlsx")
+    
     # 파일을 local path에 복사합니다. Onedrive 경로의 파일은 접근 권한 이슈가 있음
     shutil.copyfile(path, os.path.join(local_path, filename))
 
@@ -75,13 +77,24 @@ def extract_translate_append():
     version[-1] = "{:0<{width}}".format(version[-1], width=2)
     version = ".".join(version)
     data["version"] = version
+    
+    subject_area = data["hl_standards_tag"][0]['subject_area']
+    sub = [x['id'] for x in subject_area]
 
+    tag_kr = []
+    for subject_area in sub:
+        element = data['hl_standards_tag'][0]['analysis_item'][0]['key_tag'][0][subject_area]
+        kr = [kr['kr'] for kr in element]
+        tag_kr = tag_kr + kr
+
+    okt = Okt()
     result = []
-    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=14, max_col=14):
+    for row in sheet.iter_rows(min_row=sheet.max_row - 10, max_row=sheet.max_row, min_col=14, max_col=14):
         for cell in row:
             row_number = cell.row
-            if cell.value is None:
-                if sheet.cell(row=row_number, column=8).value is not None: # 완료 표시가 없는 항목
+            if cell.value == '완료': # 요청상태가 완료인 항목만
+            # if cell.value is None: # 요청상태가 완료인 항목만
+                if sheet.cell(row=row_number, column=8).value is not None: # 요청 list가 비어있지 않은 항목
                     req = sheet.cell(row=row_number, column=8).value
                     req_list = re.split(r"\n|,", req)
 
@@ -90,10 +103,17 @@ def extract_translate_append():
                     
                     for val in req_list:
                         kr = re.sub(r"\[.*\]", '', val)
-                        en = translate(kr.strip())
+                        if kr in tag_kr:
+                            continue
+                        en = translate(' '.join(okt.morphs(kr.strip()))) # konlpy 활용하여 형태소 분리 후 번역 (번역 퀄리티 높이기 위함)
                         id = re.sub("-| ", '_', en)
                         output = { "id" : str(id), "en" : str(en), "kr" : str(kr) }
                         result.append(output)
+    if result == []:
+        print('업데이트 사항이 없습니다.')
+        return
+    else:
+        print('업데이트 사항이 있습니다.')
     for item in result:
         data["hl_standards_tag"][0]["analysis_item"][0]['key_tag'][0]['common'].append(item)
     
