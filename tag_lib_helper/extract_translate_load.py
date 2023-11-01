@@ -6,25 +6,6 @@ import re
 import json
 from konlpy.tag import Okt
 
-# tag 요청 리스트 상대경로
-excel_file_path = "./Tag_library_추가요청.xlsx"
-
-# 파일 다운로드
-
-def file_download():
-    path = "/mnt/c/Users/전준표/OneDrive - 하이퍼라운지/Shared Documents/General/☀︎ 팀 회의 자료/DE_데이터팀/400. Tag Library/Tag_library_추가요청.xlsx"
-
-    filename = os.path.basename(path)
-
-    local_path = "./"
-
-    # 최신 tag library 요청 리스트를 받기 위해 파일이 존재하는 경우 삭제
-    if os.path.exists("./Tag_library_추가요청.xlsx"):
-        os.remove("./Tag_library_추가요청.xlsx")
-    
-    # 파일을 local path에 복사합니다. Onedrive 경로의 파일은 접근 권한 이슈가 있음
-    shutil.copyfile(path, os.path.join(local_path, filename))
-
 def translate(text):
     '''
     네이버 파파고 API를 활용한
@@ -58,6 +39,9 @@ def translate(text):
         print("Error Code:" , rescode)
 
 def extract_translate_append():
+    # tag 요청 리스트 상대경로
+    excel_file_path = "./Tag_library_추가요청.xlsx"
+
     wb = openpyxl.load_workbook(excel_file_path)
     sheet = wb['Sheet1']
 
@@ -104,7 +88,7 @@ def extract_translate_append():
                         kr = re.sub(r"\[.*\]", '', val).strip()
                         if kr in tag_kr:
                             continue
-                        en = translate(' '.join(okt.morphs(kr))) # konlpy 활용하여 형태소 분리 후 번역 (번역 퀄리티 높이기 위함)
+                        en = translate(' '.join(okt.morphs(kr))) # konlpy 활용하여 형태소 분리 후 번역 (번역 퀄리티 향상)
                         id = re.sub("-| ", '_', en)
                         output = { "id" : str(id), "en" : str(en), "kr" : str(kr) }
                         result.append(output)
@@ -119,13 +103,21 @@ def extract_translate_append():
     if os.path.exists(f'./hl_standards_new_tag_v{version}.json'):
         os.remove(f'./hl_standards_new_tag_v{version}.json')
 
-    with open(f'./hl_standards_new_tag_v{version}.json', 'w', encoding='utf-8') as output:
+    with open(f'./lib_lib/hl_standards_new_tag_v{version}.json', 'w', encoding='utf-8') as output:
         json.dump(data, output, indent=2, ensure_ascii=False)
+
+    if os.path.exists(f'./hl_standards_new_tag_v{version}.json'):
+        os.remove(f'./hl_standards_new_tag_v{version}.json')
+
+    with open(f'./hl_standards_new_tag.json', 'w', encoding='utf-8') as output:
+        json.dump(data, output, indent=2, ensure_ascii=False)
+
     wb.close()
 
-if __name__=='__main__':
-    # 수행요청 list file 다운로드
-    file_download()
+    return version
 
-    # 다운 받은 excel file 기반으로 추가할 list 정리
+
+if __name__=='__main__':
+
+    # 다운 받은 요청 list 기반으로 tag lib 생성
     extract_translate_append()

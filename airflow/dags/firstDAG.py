@@ -20,10 +20,9 @@ dag = DAG(
 def Hello_airflow():
     print("Hello airflow")
 
-t1 = BashOperator(
-    task_id='bash',
-    bash_command='echo "Hello airflow"',
-    dag=dag,
+file_download = PythonOperator(
+    task_id='file download',
+    python_callable=
 )
 
 t2 = PythonOperator(
