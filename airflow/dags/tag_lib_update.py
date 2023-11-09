@@ -102,8 +102,7 @@ def extract_translate_append(**kwargs):
 
     okt = Okt()
     result = []
-    for row in sheet.iter_rows(min_row=sheet.max_row - 10, max_row=sheet.max_row, min_col=14, max_col=14):
-        print(sheet.max_row)
+    for row in sheet.iter_rows(min_row=sheet.max_row - 100, max_row=sheet.max_row, min_col=14, max_col=14):
         for cell in row:
             row_number = cell.row
             if cell.value == '완료': # 요청상태가 완료인 항목만
