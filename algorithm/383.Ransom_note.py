@@ -15,3 +15,7 @@ class Solution(object):
                 return False
 
         return True
+    
+if __name__ == '__main__':
+    sol = Solution()
+    print(sol.canConstruct('ab', 'aab'))
